@@ -4,31 +4,28 @@
 
 using namespace std;
 
-//function prototypes
-
-
-class Edge
+class Node
 {
 private:
 	int node;									//node edge is connecting to
 	int weight;									//weight of edge
-	Edge* next;									//next edge in adj matrix
+	Node* next;									//next edge in adj matrix
 	void setNode(int arg) { node = arg; }		//set node connection
 	void setWeight(int arg) { weight = arg; }	//set weight of edge
 public:
-	void setNext(Edge* arg) { next = arg; }		//set next edge
+	void setNext(Node* arg) { next = arg; }		//set next edge
 	int getNode() { return node; }				//get node connection
 	int getWeight() { return weight; }			//get weight
-	Edge* getNext() { return next; }
+	Node* getNext() { return next; }
 
 	//constructors
-	Edge(int argNode, int argWeight)
+	Node(int argNode, int argWeight)
 	{
 		setNode(argNode);
 		setWeight(argWeight);
 		setNext(nullptr);
 	}
-	Edge(int argNode, int argWeight, Edge* argNext)
+	Node(int argNode, int argWeight, Node* argNext)
 	{
 		setNode(argNode);
 		setWeight(argWeight);
@@ -40,33 +37,59 @@ class Graph
 {
 private:
 	int size;
-	Edge** adjMatrix;
+	Node** adjMatrix;
 	void setSize(int arg) { size = arg; }
-	void setAdjMatrix(Edge** arg) { adjMatrix = arg; }
+	void setAdjMatrix(Node** arg) { adjMatrix = arg; }
 public:
 	int getSize() { return size; }
 
-	void printGraph()
+	//find minimum spanning tree using prim algorithm
+	void primMST()
 	{
-		cout << '\t';
+
+	}
+
+	//find minimum spanning tree using kruskal algorithm
+	void kruskalMST()
+	{
+
+	}
+
+
+	//print graph adjacency matrix
+	void print()
+	{
+		cout << '\t';	//print column labels
 		for (size_t i = 0; i < size; i++)
 			cout << i << '\t';
 		cout << endl;
 		for (size_t i = 0; i < size; i++)
 		{
-			cout << i << '\t';
-			Edge* cur = adjMatrix[i];
-			while (cur != nullptr)
-			{
-				cout << cur->getWeight() << '\t';
-				cur = cur->getNext();
+			cout << i << '\t';	//print row labels
+			Node* cur = adjMatrix[i];//set cur to first element of linked list
+			int j = 0;	//keep track of which column is being printed to
+			while (cur != nullptr)	
+			{	//print nodes until end of linked list
+				while (cur->getNode() > j)
+				{	//print as empty until a column with content is reached
+					cout << "inf\t";
+					j++;	//iterate to next column
+				}
+				cout << cur->getWeight() << '\t';	//print weight
+				cur = cur->getNext();	//iterate to next node
+				j++;	//iterate to next column
+			}
+			while (j < size)
+			{	//print for remaining columns after end of linked list
+				cout << "inf\t";
+				j++;
 			}
 			cout << endl;			
 		}
 	}
 
 	//constructor and destructor
-	Graph(int argSize, Edge** argAdjMatrix)
+	Graph(int argSize, Node** argAdjMatrix)
 	{
 		setSize(argSize);
 		setAdjMatrix(argAdjMatrix);
@@ -75,18 +98,21 @@ public:
 	{
 		for (size_t i = 0; i < size; i++)
 		{
-			Edge* cur = adjMatrix[i];
-			Edge* next = cur;
+			Node* cur = adjMatrix[i];
+			Node* next = cur;
 			while (cur != nullptr)
 			{
 				next = next->getNext();
 				delete cur;
 				cur = next;
 			}
-			delete[] adjMatrix;
 		}
-	}
+		delete[] adjMatrix;
+	};
 };
+
+//function prototypes
+Node* buildAdjRow(string);
 
 int main()
 {
@@ -95,35 +121,45 @@ int main()
 	cout << "Enter size of graph: ";
 	getline(cin, strSize);
 	int size = stoi(strSize);
-	Edge** adjMatrix = new Edge*[size];
+	Node** adjMatrix = new Node*[size];
 	
 	//get adj matrix from user line by line
+	cout << "***Enter edges in asencding order by node number***\n";
 	for (size_t i = 0; i < size; i++)
 	{
-		Edge* HEAD = new Edge(0, 0);
-		Edge* cur = HEAD;
-		cout << "Enter weights for node " << i << " (comma-delimited, inf for "
-			<< "no connection): ";
-		string input;
-		getline(cin, input);
-		stringstream ssWeights(input);
-		while (ssWeights.good())
-		{
-			//traverse the string settings building the adjacency matrix
-			string weight;
-			getline(ssWeights, weight, ',');
-			if (weight == "inf")
-				cur->setNext(new Edge(i, int(INFINITY)));
-			else
-				cur->setNext(new Edge(i, stoi(weight)));
-			cur = cur->getNext();
-		}
-		adjMatrix[i] = HEAD->getNext();
-		delete HEAD;
+		cout << "Enter weights for node " << i << " (node;weight,node;weight,...): ";
+		string userRow;
+		getline(cin, userRow);
+		adjMatrix[i] = buildAdjRow(userRow);
 	}
 
 	Graph myGraph(size, adjMatrix);
-	myGraph.printGraph();
+	myGraph.print();
 
 	return 0;
+}
+
+Node* buildAdjRow(string row)
+{
+	if (row == "")
+		return nullptr;
+	Node* HEAD = new Node(0, 0);
+	Node* cur = HEAD;
+	stringstream ssRelations(row);
+	while (ssRelations.good())
+	{
+		//traverse the string properties building the adjacency matrix
+		string node;
+		string weight;
+		string props;
+		getline(ssRelations, props, ',');
+		stringstream ssProps(props);
+		getline(ssProps, node, ';');
+		getline(ssProps, weight, ';');
+		cur->setNext(new Node(stoi(node), stoi(weight)));
+		cur = cur->getNext();
+	}
+	cur = HEAD->getNext();
+	delete HEAD;
+	return cur;
 }
