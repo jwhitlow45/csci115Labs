@@ -48,16 +48,20 @@ public:
 
 	void printGraph()
 	{
+		cout << '\t';
 		for (size_t i = 0; i < size; i++)
-			cout << '\t' << i << '\t';
+			cout << i << '\t';
+		cout << endl;
 		for (size_t i = 0; i < size; i++)
 		{
 			cout << i << '\t';
 			Edge* cur = adjMatrix[i];
-			if (cur->getNode() > size)
-				cout << "i\t";
-			else
-				cout << cur->getNode();			
+			while (cur != nullptr)
+			{
+				cout << cur->getWeight() << '\t';
+				cur = cur->getNext();
+			}
+			cout << endl;			
 		}
 	}
 
@@ -91,6 +95,7 @@ int main()
 	cout << "Enter size of graph: ";
 	getline(cin, strSize);
 	int size = stoi(strSize);
+	Edge** adjMatrix = new Edge*[size];
 	
 	//get adj matrix from user line by line
 	for (size_t i = 0; i < size; i++)
@@ -110,9 +115,15 @@ int main()
 			if (weight == "inf")
 				cur->setNext(new Edge(i, int(INFINITY)));
 			else
-				cur->setNext(new Edge(i, stoi(weight)));	
+				cur->setNext(new Edge(i, stoi(weight)));
+			cur = cur->getNext();
 		}
+		adjMatrix[i] = HEAD->getNext();
+		delete HEAD;
 	}
+
+	Graph myGraph(size, adjMatrix);
+	myGraph.printGraph();
 
 	return 0;
 }
