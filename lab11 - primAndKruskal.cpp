@@ -65,19 +65,22 @@ public:
 		cout << endl;
 		for (size_t i = 0; i < size; i++)
 		{
-			cout << i << '\t';	//print row labels
-			Node* cur = adjMatrix[i];//set cur to first element of linked list
-			int j = 0;	//keep track of which column is being printed to
+			cout << i << '\t';			//print row labels
+			Node* cur = adjMatrix[i];	//set cur to first element of
+											//linked list
+			int j = 0;					//keep track of which column is being
+											//printed to
 			while (cur != nullptr)	
 			{	//print nodes until end of linked list
 				while (cur->getNode() > j)
-				{	//print as empty until a column with content is reached
+				{						//print as empty until a column with
+											//content is reached
 					cout << "inf\t";
-					j++;	//iterate to next column
+					j++;				//iterate to next column
 				}
 				cout << cur->getWeight() << '\t';	//print weight
-				cur = cur->getNext();	//iterate to next node
-				j++;	//iterate to next column
+				cur = cur->getNext();				//iterate to next node
+				j++;								//iterate to next column
 			}
 			while (j < size)
 			{	//print for remaining columns after end of linked list
@@ -112,7 +115,8 @@ public:
 };
 
 //function prototypes
-Node* buildAdjRow(string);
+Node* buildAdjRow(string);	//builds adjacency row given string in format
+								//node;weight,node;weight,...,node;weight
 
 int main()
 {
