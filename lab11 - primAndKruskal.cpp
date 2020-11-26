@@ -1,7 +1,11 @@
 #include<iostream>
 #include<string>
+#include<sstream>
 
 using namespace std;
+
+//function prototypes
+
 
 class Edge
 {
@@ -11,8 +15,8 @@ private:
 	Edge* next;									//next edge in adj matrix
 	void setNode(int arg) { node = arg; }		//set node connection
 	void setWeight(int arg) { weight = arg; }	//set weight of edge
-	void setNext(Edge* arg) { next = arg; }		//set next edge
 public:
+	void setNext(Edge* arg) { next = arg; }		//set next edge
 	int getNode() { return node; }				//get node connection
 	int getWeight() { return weight; }			//get weight
 	Edge* getNext() { return next; }
@@ -36,9 +40,9 @@ class Graph
 {
 private:
 	int size;
-	Edge* adjMatrix;
+	Edge** adjMatrix;
 	void setSize(int arg) { size = arg; }
-	void setAdjMatrix(Edge* arg) { adjMatrix = arg; }
+	void setAdjMatrix(Edge** arg) { adjMatrix = arg; }
 public:
 	int getSize() { return size; }
 
@@ -49,7 +53,7 @@ public:
 		for (size_t i = 0; i < size; i++)
 		{
 			cout << i << '\t';
-			Edge* cur = &adjMatrix[i];
+			Edge* cur = adjMatrix[i];
 			if (cur->getNode() > size)
 				cout << "i\t";
 			else
@@ -57,7 +61,8 @@ public:
 		}
 	}
 
-	Graph(int argSize, Edge* argAdjMatrix)
+	//constructor and destructor
+	Graph(int argSize, Edge** argAdjMatrix)
 	{
 		setSize(argSize);
 		setAdjMatrix(argAdjMatrix);
@@ -66,7 +71,7 @@ public:
 	{
 		for (size_t i = 0; i < size; i++)
 		{
-			Edge* cur = &adjMatrix[i];
+			Edge* cur = adjMatrix[i];
 			Edge* next = cur;
 			while (cur != nullptr)
 			{
@@ -81,5 +86,33 @@ public:
 
 int main()
 {
+	string strSize;
+	//get size of graph from user
+	cout << "Enter size of graph: ";
+	getline(cin, strSize);
+	int size = stoi(strSize);
+	
+	//get adj matrix from user line by line
+	for (size_t i = 0; i < size; i++)
+	{
+		Edge* HEAD = new Edge(0, 0);
+		Edge* cur = HEAD;
+		cout << "Enter weights for node " << i << " (comma-delimited, inf for "
+			<< "no connection): ";
+		string input;
+		getline(cin, input);
+		stringstream ssWeights(input);
+		while (ssWeights.good())
+		{
+			//traverse the string settings building the adjacency matrix
+			string weight;
+			getline(ssWeights, weight, ',');
+			if (weight == "inf")
+				cur->setNext(new Edge(i, int(INFINITY)));
+			else
+				cur->setNext(new Edge(i, stoi(weight)));	
+		}
+	}
+
 	return 0;
 }
