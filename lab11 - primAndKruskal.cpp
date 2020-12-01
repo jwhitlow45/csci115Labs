@@ -1,7 +1,7 @@
 #include<iostream>
-#include<queue>
 #include<string>
 #include<sstream>
+#include<vector>
 using namespace std;
 
 class Node
@@ -35,38 +35,83 @@ public:
 	}
 };
 
+class minPQ
+{
+private:
+	vector<Node> q;
+public:
+	//get size of queue
+	int size()
+	{
+		return q.size();
+	}
+	//get top from queue
+	Node top()
+	{
+		return q.front();
+	}
+	//pop node from queue
+	void pop()
+	{
+		for (size_t i = 0; i < q.size() - 1; i++)
+			swap(q[i], q[i + 1]);
+		q.pop_back();
+	}
+	//push node to queue
+	void push(Node element)
+	{
+		int index = q.size() - 1;
+		q.push_back(element);
+		while (element.getWeight() < q[index].getWeight() && index >= 0)
+			index--;
+		swap(q[q.size() - 1], q[index + 1]);
+	}
+	//find node in queue
+	bool find(int nodeNum)
+	{
+		for (Node x : q)
+		{
+			if (x.getNode() == nodeNum)
+				return true;
+		}
+		return false;
+	}
+	//decrease key of value in queue
+	bool decKey(int nodeNum, int newKey)
+	{
+		if (!find(nodeNum))
+			return false;
+		for (Node x : q)
+		{
+			if (x.getNode() == nodeNum)
+			{
+				if (x.getWeight() > newKey)
+				{
+					x.setWeight(newKey);
+					return true;
+				}
+				else
+					return false;
+			}
+		}
+	}
+};
+
 class Graph
 {
 private:
-	int size;
-	Node** adjMatrix;
-	void setSize(int arg) { size = arg; }
-	void setAdjMatrix(Node** arg) { adjMatrix = arg; }
-	bool compNodes(Node* a, Node* b)	//compare function for priority queue
-	{
-		return (a->getWeight() < b->getWeight());
-	}
+	int size;			//number of nodes in graph
+	Node** adjMatrix;	//adj matrix making up graph
+	void setSize(int arg) { size = arg; }	//set size of graph
+	void setAdjMatrix(Node** arg) { adjMatrix = arg; }	//allocate adj matrix
+
 public:
 	int getSize() { return size; }
 
 	//find minimum spanning tree using prim algorithm
 	void primMST(int startNode)
 	{
-		//comparitor function for priority queue
-		auto compareNode = [](Node left, Node right)
-		{
-			return (left.getWeight() > right.getWeight());
-		};
-		priority_queue<Node, vector<Node>,	//priority queue for prim
-			decltype(compareNode)> nodePQ(compareNode);
 		
-		for (size_t i = 0; i < size; i++)
-		{
-			Node myNode = *adjMatrix[i];
-			myNode.setWeight(int(INFINITY));
-			myNode.setParent(NULL);
-			nodePQ.push(myNode);
-		}
 	}
 
 	//find minimum spanning tree using kruskal algorithm
@@ -159,7 +204,7 @@ int main()
 
 	Graph myGraph(size, adjMatrix);
 	myGraph.print();
-	myGraph.primMST();
+	myGraph.primMST(0);
 
 	return 0;
 }
