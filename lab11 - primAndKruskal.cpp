@@ -1,7 +1,7 @@
 #include<iostream>
+#include<queue>
 #include<string>
 #include<sstream>
-
 using namespace std;
 
 class Node
@@ -9,14 +9,16 @@ class Node
 private:
 	int node;									//node edge is connecting to
 	int weight;									//weight of edge
+	int parent;									//parent of node
 	Node* next;									//next edge in adj matrix
 	void setNode(int arg) { node = arg; }		//set node connection
-	void setWeight(int arg) { weight = arg; }	//set weight of edge
 public:
 	void setNext(Node* arg) { next = arg; }		//set next edge
+	void setParent(int arg) { parent = arg; }	//set parent of node
+	void setWeight(int arg) { weight = arg; }	//set weight of edge
 	int getNode() { return node; }				//get node connection
 	int getWeight() { return weight; }			//get weight
-	Node* getNext() { return next; }
+	Node* getNext() { return next; }			//get next node in linked list
 
 	//constructors
 	Node(int argNode, int argWeight)
@@ -40,13 +42,31 @@ private:
 	Node** adjMatrix;
 	void setSize(int arg) { size = arg; }
 	void setAdjMatrix(Node** arg) { adjMatrix = arg; }
+	bool compNodes(Node* a, Node* b)	//compare function for priority queue
+	{
+		return (a->getWeight() < b->getWeight());
+	}
 public:
 	int getSize() { return size; }
 
 	//find minimum spanning tree using prim algorithm
-	void primMST()
+	void primMST(int startNode)
 	{
-
+		//comparitor function for priority queue
+		auto compareNode = [](Node left, Node right)
+		{
+			return (left.getWeight() > right.getWeight());
+		};
+		priority_queue<Node, vector<Node>,	//priority queue for prim
+			decltype(compareNode)> nodePQ(compareNode);
+		
+		for (size_t i = 0; i < size; i++)
+		{
+			Node myNode = *adjMatrix[i];
+			myNode.setWeight(int(INFINITY));
+			myNode.setParent(NULL);
+			nodePQ.push(myNode);
+		}
 	}
 
 	//find minimum spanning tree using kruskal algorithm
@@ -139,6 +159,7 @@ int main()
 
 	Graph myGraph(size, adjMatrix);
 	myGraph.print();
+	myGraph.primMST();
 
 	return 0;
 }
