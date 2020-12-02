@@ -30,7 +30,7 @@ public:
 void primsMST(Graph G, int startNode);			//prims mst algorithm
 void kruskalsMST(Graph G, int startNode);		//kruskals mst algorithm
 void printMatrix(int** matrix, int size);		//print matrix
-void printMST(int* parentList, int size);		//print mst
+void printMST(Graph G, int* parentList, int size);		//print mst
 
 int main()
 {
@@ -111,7 +111,7 @@ void primsMST(Graph G, int startNode)
 	}
 
 	cout << endl;
-	printMST(parents, G.getSize());
+	printMST(G, parents, G.getSize());
 	cout << endl;
 
 	delete[] parents;
@@ -134,23 +134,72 @@ void kruskalUnion(int* parents, int u, int v)
 		parents[v1] = v2;
 }
 
-void kruskalsMST(Graph G, int startNode)
+bool kruskalUnionFind(int* parents, int u, int v, int size)
 {
+	if (parents[u] != parents[v])
+	{
+		int parU = parents[u];
+		int parV = parents[v];
+		for (size_t i = 0; i < size; i++)
+		{
+			if (parents[i] == parV)
+				parents[i] = parU;
+		}
+		return true;
+	}
+	return false;
 }
 
-void printMST(int* parentList, int size)
+void kruskalsMST(Graph G, int startNode)
+{
+	int* parents = new int[G.getSize()];
+
+	//set each node as its own parents
+	for (size_t u = 0; u < G.getSize(); u++)
+		parents[u] = u;
+
+	int minimum = INT_MAX;	//minimum weight of graph
+	int minU;				//u of minimum
+	int minV;				//v of minimum
+	for (size_t i = 0; i < G.getSize(); i++)
+	{
+		for (size_t u = 0; u < G.getSize(); u++)
+		{
+			for (size_t v = 0; v < u; v++)
+			{
+				if (minimum > G.matrix[u][v])
+				{
+					minimum = G.matrix[u][v];
+					minU = u;
+					minV = v;
+				}
+			}
+		}
+		if(kruskalUnionFind(parents, minU, minV, G.getSize()))
+			kruskalUnion(parents, minU, minV);
+	}
+
+	cout << endl;
+	printMST(G, parents, G.getSize());
+	cout << endl;
+
+	delete[] parents;
+}
+
+void printMST(Graph G, int* parentList, int size)
 {
 	for (size_t i = 0; i < size; i++)
 	{
-		cout << "Node " << i << ": Parent ";
-		if (parentList[i] == -1)
-			cout << "ROOT";
-		else
-			cout << parentList[i];
+		for (size_t j = 0; j < size; j++)
+		{
+			if (parentList[i] == j || parentList[j] == i)
+				cout << G.matrix[i][j] << ' ';
+			else
+				cout << "x ";
+		}
 		cout << endl;
 	}
 }
-
 
 void printMatrix(int** matrix, int size)
 {
