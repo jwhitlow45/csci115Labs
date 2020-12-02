@@ -70,17 +70,17 @@ int main()
 void primsMST(Graph G, int startNode)
 {
 	//initialize starting lists and output matrix
-	int* parentList = new int[G.getSize()];
-	int* keyList = new int[G.getSize()];
-	bool* vertexList = new bool[G.getSize()];
+	int* parents = new int[G.getSize()];
+	int* keys = new int[G.getSize()];
+	bool* vertices = new bool[G.getSize()];
 	
 	for (size_t i = 0; i < G.getSize(); i++)
 	{
-		keyList[i] = INT_MAX;
-		vertexList[i] = false;
+		keys[i] = INT_MAX;
+		vertices[i] = false;
 	}
-	keyList[startNode] = 0;
-	parentList[startNode] = -1;
+	keys[startNode] = 0;
+	parents[startNode] = -1;
 
 	//for every vertex
 	for (size_t i = 0; i < G.getSize() - 1; i++)
@@ -91,39 +91,45 @@ void primsMST(Graph G, int startNode)
 		int smallest = INT_MAX;
 		for (size_t v = 0; v < G.getSize(); v++)
 		{
-			if (vertexList[v] == false && smallest > keyList[v])
+			if (vertices[v] == false && keys[v] < smallest)
 			{
 				u = v;
+				smallest = keys[v];
 			}
 		}
-		vertexList[u] = true;
+		vertices[u] = true;
 
 		for (size_t v = 0; v < G.getSize(); v++)
 		{	//update weights for each node adj to u
-			if (G.matrix[u][v] != 0 &&
-				vertexList[v] == false &&
-				G.matrix[u][v] < keyList[v])
+			if (G.matrix[u][v] &&
+				vertices[v] == false &&
+				G.matrix[u][v] < keys[v])
 			{
-				parentList[v] = u;
-				keyList[v] = G.matrix[u][v];
+				parents[v] = u;
+				keys[v] = G.matrix[u][v];
 			}
 		}
 	}
 
 	cout << endl;
-	printMST(parentList, G.getSize());
+	printMST(parents, G.getSize());
 	cout << endl;
 
-	delete[] parentList;
-	delete[] vertexList;
-	delete[] keyList;
+	delete[] parents;
+	delete[] vertices;
+	delete[] keys;
 }
 
 void printMST(int* parentList, int size)
 {
 	for (size_t i = 0; i < size; i++)
 	{
-		cout << i << ":" << parentList[i] << " ";
+		cout << "Node " << i << ": Parent ";
+		if (parentList[i] == -1)
+			cout << "ROOT";
+		else
+			cout << parentList[i];
+		cout << endl;
 	}
 }
 
