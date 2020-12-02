@@ -76,7 +76,7 @@ void primsMST(Graph G, int startNode)
 	
 	for (size_t i = 0; i < G.getSize(); i++)
 	{
-		keyList[i] = 0;
+		keyList[i] = INT_MAX;
 		vertexList[i] = false;
 	}
 	keyList[startNode] = 0;
