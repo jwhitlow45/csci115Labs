@@ -24,18 +24,12 @@ public:
 				matrix[i][j] = 0;
 		}
 	}
-	~Graph()
-	{
-		for (size_t i = 0; i < size; i++)
-		{
-			delete[] matrix[i];
-		}
-	}
 };
 
 //function prototypes
 void primsMST(Graph G, int startNode);	//prims mst algorithm
-void print(int** matrix, int size);		//print matrix
+void printMatrix(int** matrix, int size);		//print matrix
+void printMST(int* parentList, int size);		//print mst
 
 int main()
 {
@@ -94,20 +88,19 @@ void primsMST(Graph G, int startNode)
 		//find min key of key list
 		int u;	//index of minimum
 
-		int min = INT_MAX;
-		for (size_t j = 0; j < G.getSize(); j++)
+		int smallest = INT_MAX;
+		for (size_t v = 0; v < G.getSize(); v++)
 		{
-			if (vertexList[j] == false && keyList[j] < min)
+			if (vertexList[v] == false && smallest > keyList[v])
 			{
-				min = keyList[j];
-				u = j;
+				u = v;
 			}
 		}
 		vertexList[u] = true;
 
 		for (size_t v = 0; v < G.getSize(); v++)
 		{	//update weights for each node adj to u
-			if (G.matrix[u][v] &&
+			if (G.matrix[u][v] != 0 &&
 				vertexList[v] == false &&
 				G.matrix[u][v] < keyList[v])
 			{
@@ -117,10 +110,25 @@ void primsMST(Graph G, int startNode)
 		}
 	}
 
+	cout << endl;
+	printMST(parentList, G.getSize());
+	cout << endl;
+
+	delete[] parentList;
+	delete[] vertexList;
+	delete[] keyList;
+}
+
+void printMST(int* parentList, int size)
+{
+	for (size_t i = 0; i < size; i++)
+	{
+		cout << i << ":" << parentList[i] << " ";
+	}
 }
 
 
-void print(int** matrix, int size)
+void printMatrix(int** matrix, int size)
 {
 	for (size_t i = 0; i < size; i++)
 	{
