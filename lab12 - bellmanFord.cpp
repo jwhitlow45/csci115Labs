@@ -16,6 +16,13 @@ public:
 	int getNumE() { return numE; }
 	int** edgeMatrix;
 
+	void cleanup()
+	{
+		for (size_t i = 0; i < getNumE(); i++)
+			delete[] edgeMatrix[i];
+		delete[] edgeMatrix;
+	}
+
 	Graph(int argV, int argE)
 	{
 		setNumV(argV);
@@ -46,7 +53,7 @@ int main()
 	cout << "Enter number of edges: ";
 	cin >> numEdge;
 	cin.ignore();
-	Graph myGraph(numVertex, numEdge);
+	Graph* myGraph =  new Graph(numVertex, numEdge);
 	cout << "Enter starting vertex: ";
 	cin >> startVertex;
 	cin.ignore();
@@ -63,19 +70,22 @@ int main()
 		getline(sEdges, v2, ',');		//get finishing node
 		getline(sEdges, weight, ';');	//get edge weight
 		//store retrieved values into edge matrix in Graph
-		myGraph.edgeMatrix[i][0] = stoi(v1);
-		myGraph.edgeMatrix[i][1] = stoi(v2);
-		myGraph.edgeMatrix[i][2] = stoi(weight);
+		myGraph->edgeMatrix[i][0] = stoi(v1);
+		myGraph->edgeMatrix[i][1] = stoi(v2);
+		myGraph->edgeMatrix[i][2] = stoi(weight);
 		i++;
 	}
 	//check if sufficient number of edges were entered
-	if (i < numVertex || i > numVertex)
+	if (i < numEdge || i > numEdge)
 	{
 		cout << "ERROR:Invalid number of edges entered.";
 		return 0;
 	}
 
-
+	//run BellmanFord algorithm
+	bellmanFord(*myGraph, 0);
+	myGraph->cleanup();
+	delete myGraph;
 	return 0;
 }
 
@@ -83,10 +93,43 @@ void bellmanFord(Graph G, int startNode)
 {
 	//array to store distance from source to rest of vertex
 	int* distanceList = new int[G.getNumV()];
+	//instantiate distance list to inf, start node is 0
 	for (size_t i = 0; i < G.getNumV(); i++)
 		distanceList[i] = INT_MAX;
+	distanceList[startNode] = 0;
 
+	//iterate v-1 times
+	for (size_t i = 0; i < G.getNumV() - 1; i++)
+	{
+		for (size_t j = 0; j < G.getNumE(); j++)
+		{	//look for shorter path between nodes
+			int v1 = G.edgeMatrix[j][0];
+			int v2 = G.edgeMatrix[j][1];
+			int w = G.edgeMatrix[j][2];
+			if (distanceList[v1] + w < distanceList[v2])
+				distanceList[v2] = distanceList[v1] + w;
+		}
+	}
 
-	
-	delete distanceList;
+	//check for negative weight cycles
+	for (size_t j = 0; j < G.getNumE(); j++)
+	{
+		int v1 = G.edgeMatrix[j][0];
+		int v2 = G.edgeMatrix[j][1];
+		int w = G.edgeMatrix[j][2];
+		if (distanceList[v1] + w < distanceList[v2])
+		{
+			cout << "ERROR: Graph contains a negative weight cycle.";
+			return;
+		}
+	}
+
+	//print out distance from source to each vertex
+	cout << "Vertex\t\tDistance from source vertex" << endl;
+	for (size_t i = 0; i < G.getNumV(); i++)
+	{
+		cout << i << "\t\t" << distanceList[i] << endl;
+	}
+
+	delete[] distanceList;
 }
