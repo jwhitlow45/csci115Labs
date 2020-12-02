@@ -27,7 +27,8 @@ public:
 };
 
 //function prototypes
-void primsMST(Graph G, int startNode);	//prims mst algorithm
+void primsMST(Graph G, int startNode);			//prims mst algorithm
+void kruskalsMST(Graph G, int startNode);		//kruskals mst algorithm
 void printMatrix(int** matrix, int size);		//print matrix
 void printMST(int* parentList, int size);		//print mst
 
@@ -47,6 +48,7 @@ int main()
 		getline(cin, input);
 		stringstream inputs(input);
 
+		//build matrix from user input
 		int* row = new int[stoi(userSize)];
 		int j = 0;
 		while (inputs.good())
@@ -61,11 +63,8 @@ int main()
 
 	primsMST(myGraph, 0);
 
-
 	return 0;
 }
-
-
 
 void primsMST(Graph G, int startNode)
 {
@@ -79,8 +78,8 @@ void primsMST(Graph G, int startNode)
 		keys[i] = INT_MAX;
 		vertices[i] = false;
 	}
-	keys[startNode] = 0;
-	parents[startNode] = -1;
+	keys[startNode] = 0;		//set start node key to 0 to init start
+	parents[startNode] = -1;	//set parent of start node to -1 as it is root
 
 	//for every vertex
 	for (size_t i = 0; i < G.getSize() - 1; i++)
@@ -118,6 +117,25 @@ void primsMST(Graph G, int startNode)
 	delete[] parents;
 	delete[] vertices;
 	delete[] keys;
+}
+
+int kruskalFind(int* parents, int u)
+{
+	while (parents[u] != u)
+		u = parents[u];
+	return u;
+}
+
+void kruskalUnion(int* parents, int u, int v)
+{
+	int v1 = kruskalFind(parents, u);
+	int v2 = kruskalFind(parents, v);
+	if (v1 != v2)
+		parents[v1] = v2;
+}
+
+void kruskalsMST(Graph G, int startNode)
+{
 }
 
 void printMST(int* parentList, int size)
