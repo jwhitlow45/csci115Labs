@@ -5,6 +5,8 @@
 
 using namespace std;
 
+#define INT_MAX 2147483647
+
 class Node
 {
 private:
