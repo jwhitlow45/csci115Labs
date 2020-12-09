@@ -1,7 +1,7 @@
 #Ignore extension-less files
-*		#ignore all
-!*.*	#unignore files with extensions
-!*/		#unignore all directories
+*
+!*.*
+!*/
 
 #Ignore VSCode setup files
 **/.vscode
